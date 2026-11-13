@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: parkwise-api
+    runtime: python
+    rootDir: web/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: starter
+    disk:
+      name: parkwise-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_PATH
+        value: /var/data/parkwise.db
