@@ -1,0 +1,9 @@
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/tickets/*.pdf
+data/receipts/*.pdf
+data/exports/*.csv
+__pycache__/
+*.pyc
+*.csv
