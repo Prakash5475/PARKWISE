@@ -21,15 +21,93 @@ return <div className="app"><aside className={'sidebar '+(mobile?'open':'')}><di
 {page==='Analytics'&&<><div className="statgrid"><Stat icon={Ticket}label="Total sessions"value={analytics?.totals.sessions??'â€”'}sub="All recorded sessions"tone="blue"/><Stat icon={Wallet}label="Total revenue"value={money(analytics?.totals.revenue)}sub="Collected payments"tone="green"/><Stat icon={Car}label="Current occupancy"value={`${stat.occupancy}%`}sub={`${stat.occupied} of ${stat.total} bays`}tone="cyan"/><Stat icon={Clock3}label="Waiting vehicles"value={stat.queue}sub="Maximum queue size 3"tone="purple"/></div><div className="analyticsgrid"><section className="panel"><div className="panelhead"><div><h3>Vehicle category mix</h3><p>Recorded parking sessions</p></div></div><div className="chart"><ResponsiveContainer width="100%" height="260"><BarChart data={analytics?.byType||[]}><CartesianGrid strokeDasharray="3 3" stroke="#202b3e" vertical={false}/><XAxis dataKey="label" stroke="#71819a"/><YAxis stroke="#71819a"/><Tooltip contentStyle={{background:'#101a2b',border:'1px solid #29364d',borderRadius:12}}/><Bar dataKey="value" fill="#36c5d9" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></div></section><section className="panel"><div className="panelhead"><div><h3>Floor distribution</h3><p>Active parked vehicles</p></div></div><div className="chart"><ResponsiveContainer width="100%" height="260"><BarChart data={data.floors.map(x=>({label:x.floor==='G'?'Ground':'Level '+x.floor,value:x.occupied}))}><CartesianGrid strokeDasharray="3 3" stroke="#202b3e" vertical={false}/><XAxis dataKey="label" stroke="#71819a"/><YAxis stroke="#71819a"/><Tooltip contentStyle={{background:'#101a2b',border:'1px solid #29364d',borderRadius:12}}/><Bar dataKey="value" fill="#8b7cf6" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></div></section></div></>}
 {page==='Activity logs'&&<section className="panel"><div className="panelhead"><div><h3>Activity timeline</h3><p>Recent events across the facility</p></div><span className="pulse"><i/> LIVE</span></div><div className="timeline">{data.events.map(e=><div className="timelineitem" key={e.id}><div className="timelineicon"><Activity size={16}/></div><div><b>{e.message}</b><small>{e.category} Â· {new Date(e.ts).toLocaleString()}</small></div></div>)}</div></section>}
 </>}
-<footer><span>Â© 2026 PARKWISE Â· SMART PARKING CONTROL</span><span>Built for intelligent mobility <i>âœ³</i></span></footer></div></main>
+<footer><span>2026 PARKWISE - SMART PARKING CONTROL</span><span>Built for intelligent mobility</span></footer></div></main>
 {modal==='arrival'&&<Modal title="Register vehicle" subtitle="Create a new parking session and allocate a bay." onClose={()=>setModal('')}><ArrivalForm onSubmit={async x=>{await act('/api/arrivals',x)}}/></Modal>}
 </div>}
 function Stat({icon:Icon,label,value,sub,tone}){return <div className="statcard"><div className={'staticon '+tone}><Icon size={19}/></div><div className="statlabel">{label}</div><div className="statvalue">{value}</div><div className="statsub">{sub}</div></div>}
-function Garage({slots,floor,onSelect,large=false,animated=false}){let top=slots.filter(s=>s.num<=9),bottom=slots.filter(s=>s.num>=10);return <div className={'garage '+(large?'largegarage':'')}><div className="garageheader"><span>â† NORTH / SERVICE ACCESS</span><span>{floor==='G'?'G':floor} FLOOR Â· BAY PLAN</span><span>VENTILATION ZONE â†’</span></div><div className="garageinside"><div className="bayrow">{top.map(s=><Bay key={s.id}slot={s}onClick={()=>onSelect?.(s)}/>)}</div><div className="driveway"><div className="lane-line"/><span>â†— ONE WAY TRAFFIC LANE</span><div className="entrymark">ENTRY GATE</div></div><div className="bayrow">{bottom.map(s=><Bay key={s.id}slot={s}onClick={()=>onSelect?.(s)}/>)}</div></div><div className="garagefooter"><span>EMERGENCY EXIT</span><span>RAMP TO NEXT FLOOR â†—</span><span>FIRE SAFETY ZONE</span></div>{animated&&<div className="garagescan"/>}</div>}
-function Bay({slot:s,onClick}){let occupied=s.status==='OCCUPIED',reserved=s.status==='RESERVED';return <button onClick={onClick} className={'bay '+(occupied?'bayoccupied':reserved?'bayreserved':'bayfree')+' '+s.category.toLowerCase()} title={`${s.id} Â· ${s.category} Â· ${s.status}`}><span className="baynum">{s.id}</span>{occupied?<span className="vehicle">{s.category==='MOTO'?'ðŸï¸':s.category==='EV'?'ðŸš™':s.category==='VIP'?'ðŸš˜':'ðŸš—'}</span>:<span className="baytype">{s.category==='ACCESSIBLE'?'â™¿':s.category==='EV'?'âš¡':s.category==='VIP'?'VIP':s.category==='MOTO'?'BIKE':'P'}</span>}<span className="baystate">{occupied?'OCCUPIED':reserved?'RESERVED':'FREE'}</span></button>}
+function VehicleSprite({kind="CAR",color="#38bdf8",compact=false}) {
+  const bike = kind==="BIKE" || kind==="MOTO";
+  return <svg className={"vehicle-svg "+(bike?"bike-svg":"car-svg")+(compact?" compact":"")}
+    viewBox={bike?"0 0 76 42":"0 0 92 48"} role="img"
+    aria-label={bike?"Motorcycle":"Car"}>
+    {bike ?
+      <g stroke="#dce8f5" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none">
+        <circle cx="17" cy="31" r="8"/>
+        <circle cx="59" cy="31" r="8"/>
+        <path d="M17 31l13-16 10 16H17l13-16h16l13 16M40 31l8-13 11 13M28 13h9M46 13l7 3"/>
+        <path d="M34 12l-5-5M49 12l5-5"/>
+      </g>
+      :
+      <g stroke="#dce8f5" strokeWidth="1.7" strokeLinejoin="round">
+        <path d="M12 30l5-12q2-5 8-5h39q6 0 9 6l7 11v8H12z" fill={color}/>
+        <path d="M27 15l-5 12h47l-6-12z" fill="#14243a"/>
+        <path d="M8 29h76" fill="none"/>
+        <circle cx="27" cy="37" r="6" fill="#09111d"/>
+        <circle cx="68" cy="37" r="6" fill="#09111d"/>
+        <circle cx="27" cy="37" r="2.5" fill="#9aacc1" stroke="none"/>
+        <circle cx="68" cy="37" r="2.5" fill="#9aacc1" stroke="none"/>
+        <path d="M12 28h5M76 28h5" stroke="#f7d17a" strokeWidth="3"/>
+      </g>
+    }
+  </svg>;
+}
+
+function Garage({slots,floor,onSelect,large=false,animated=false}) {
+  let top=slots.filter(s=>s.num<=9);
+  let bottom=slots.filter(s=>s.num>=10);
+
+  return <div className={"garage "+(large?"largegarage":"")}>
+    <div className="garageheader">
+      <span>NORTH / SERVICE ACCESS</span>
+      <span>{floor==="G"?"G":floor} FLOOR - BAY PLAN</span>
+      <span>VENTILATION ZONE</span>
+    </div>
+    <div className="garageinside">
+      <div className="bayrow">
+        {top.map(s=><Bay key={s.id} slot={s} onClick={()=>onSelect?.(s)}/>)}
+      </div>
+      <div className="driveway">
+        <div className="lane-line"/>
+        <span>ONE WAY TRAFFIC LANE</span>
+        <div className="entrymark">ENTRY GATE</div>
+      </div>
+      <div className="bayrow">
+        {bottom.map(s=><Bay key={s.id} slot={s} onClick={()=>onSelect?.(s)}/>)}
+      </div>
+    </div>
+    <div className="garagefooter">
+      <span>EMERGENCY EXIT</span>
+      <span>RAMP TO NEXT FLOOR</span>
+      <span>FIRE SAFETY ZONE</span>
+    </div>
+    {animated&&<div className="garagescan"/>}
+  </div>;
+}
+
+function Bay({slot:s,onClick}) {
+  let occupied=s.status==="OCCUPIED";
+  let reserved=s.status==="RESERVED";
+  const kind=s.kind || (s.category==="MOTO"?"BIKE":s.category==="EV"?"EV":s.category==="VIP"?"VIP":"CAR");
+
+  return <button onClick={onClick}
+    className={"bay "+(occupied?"bayoccupied":reserved?"bayreserved":"bayfree")+" "+s.category.toLowerCase()}
+    title={`${s.id} - ${s.category} - ${s.status}`}>
+    <span className="baynum">{s.id}</span>
+    {occupied ?
+      <span className="vehicle"><VehicleSprite kind={kind} color={s.color||"#38bdf8"} compact/></span>
+      :
+      <span className="baytype">
+        {s.category==="ACCESSIBLE"?"ACCESS":s.category==="EV"?"EV":s.category==="VIP"?"VIP":s.category==="MOTO"?"BIKE":"CAR"}
+      </span>
+    }
+    <span className="baystate">{occupied?"OCCUPIED":reserved?"RESERVED":"FREE"}</span>
+    {occupied&&s.vehicle&&<span className="bayplate">{s.vehicle}</span>}
+  </button>;
+}
 function ArrivalForm({onSubmit}){const[vehicle,setVehicle]=useState('');const[kind,setKind]=useState('CAR');const[color,setColor]=useState('#38bdf8');const[permit,setPermit]=useState(false);const[sending,setSending]=useState(false);return <form className="arrivalform" onSubmit={async e=>{e.preventDefault();setSending(true);try{await onSubmit({vehicle,kind,color,permit});setVehicle('')}catch{}finally{setSending(false)}}}><label>Vehicle registration<input required minLength="3" maxLength="16" placeholder="e.g. MH12AB1234" value={vehicle} onChange={e=>setVehicle(e.target.value.toUpperCase())}/></label><label>Vehicle category<select value={kind} onChange={e=>setKind(e.target.value)}><option value="CAR">Car Â· â‚¹40 / hour</option><option value="BIKE">Bike Â· â‚¹20 / hour</option><option value="EV">Electric vehicle Â· â‚¹50 / hour</option><option value="VIP">VIP Â· â‚¹60 / hour</option></select></label><label>Vehicle colour<div className="colorinput"><input type="color" value={color} onChange={e=>setColor(e.target.value)}/><span>{color.toUpperCase()}</span></div></label><label className="checklabel"><input type="checkbox" checked={permit} onChange={e=>setPermit(e.target.checked)}/> Accessible parking permit holder</label><button className="btn primary submitbtn" disabled={sending}>{sending?'Allocatingâ€¦':'Allocate parking bay'} <ArrowUpRight size={16}/></button><small className="formhint">Allocation follows PARKWISE vehicle-category and nearest-bay rules. 5-minute grace period Â· 18% GST.</small></form>}
 function ReservationForm({onSubmit}){const[slot,setSlot]=useState('G-1');const[vehicle,setVehicle]=useState('');const[kind,setKind]=useState('CAR');const[sending,setSending]=useState(false);return <form className="reservationform" onSubmit={async e=>{e.preventDefault();setSending(true);try{await onSubmit({slot,vehicle,kind})}catch{}finally{setSending(false)}}}><input required value={vehicle} onChange={e=>setVehicle(e.target.value.toUpperCase())} placeholder="Vehicle registration"/><select value={slot} onChange={e=>setSlot(e.target.value)}>{['G','1','2'].flatMap(f=>Array.from({length:18},(_,i)=><option key={f+'-'+(i+1)} value={f+'-'+(i+1)}>{f==='G'?'Ground':`Level ${f}`} Â· Bay {i+1}</option>))}</select><select value={kind} onChange={e=>setKind(e.target.value)}><option>CAR</option><option>BIKE</option><option>EV</option><option>VIP</option></select><button className="btn secondary small" disabled={sending}>Reserve bay</button></form>}
 function Modal({title,subtitle,onClose,children}){return <div className="modalback" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><div className="modal"><div className="modalhead"><div><h2>{title}</h2><p>{subtitle}</p></div><button className="iconbtn" onClick={onClose}><X/></button></div>{children}</div></div>}
 
 createRoot(document.getElementById('root')).render(<App/>);
+
 

@@ -2,3 +2,65 @@
 @media(max-width:1100px){.sidebar{width:220px}.main{margin-left:220px}.content{padding:27px 23px}.topbar{padding:0 23px}.statgrid{grid-template-columns:repeat(2,1fr)}.gridmain{grid-template-columns:1fr}.sidepanel{display:grid;grid-template-columns:repeat(2,1fr);gap:0 15px}.sidepanel .panelhead,.sidepanel .quickbox,.sidepanel .eventmini{grid-column:1/-1}.management-grid{grid-template-columns:1fr 1fr}.largegarage .bay{height:75px}}
 @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.25s;width:260px}.sidebar.open{transform:translateX(0);box-shadow:20px 0 60px #0009}.mobileclose{display:grid;margin-left:auto}.main{margin-left:0}.topbar{height:58px;padding:0 16px}.hamburger{display:grid}.crumb{margin-right:auto;margin-left:10px}.topright{gap:10px}.content{padding:23px 14px}.pagehead{align-items:flex-start;flex-direction:column}.pagehead h1{font-size:24px}.head-actions{width:100%}.head-actions .btn{flex:1}.statgrid{gap:9px}.statcard{min-height:126px;padding:13px}.statvalue{font-size:19px}.floorcards{gap:5px}.floorcard{padding:8px 6px}.floorrow{font-size:9px}.garage{padding:8px 5px}.garageinside{padding:8px 4px}.bayrow{gap:3px}.bay{height:51px;padding:2px 1px}.baynum{font-size:6px}.baytype{font-size:10px}.baystate{font-size:5px}.vehicle{font-size:14px}.garageheader,.garagefooter{font-size:5px;letter-spacing:.5px}.largegarage .bay{height:61px}.largegarage .vehicle{font-size:20px}.largegarage .baytype{font-size:13px}.largegarage .baystate{font-size:6px}.monitorcontrols{flex-wrap:wrap}.panel{padding:13px}.panelhead{align-items:flex-start}.monitor-panel .panelhead{flex-direction:column}.simulation-wrap{padding:9px}.management-grid{grid-template-columns:1fr}.management-grid>.panel:first-child{grid-row:auto}.analyticsgrid{grid-template-columns:1fr}.sidepanel{display:block}.sidepanel .panelhead,.sidepanel .quickbox,.sidepanel .eventmini{grid-column:auto}.simulation-foot{gap:15px}.simulation-foot b{font-size:9px}.searchbox input{width:130px}footer{font-size:7px;gap:10px}.top-live{display:none}}
 .reservationform{display:grid;grid-template-columns:1.2fr .8fr .6fr auto;gap:6px;margin:0 0 14px}.reservationform input,.reservationform select{min-width:0;width:100%;background:#0b1523;border:1px solid #2b3c53;border-radius:6px;color:#cbd7e6;padding:8px;font-size:9px}.reservationform .btn{white-space:nowrap}@media(max-width:760px){.reservationform{grid-template-columns:1fr 1fr}.reservationform input{grid-column:1/-1}}
+
+/* PARKWISE vehicle graphics */
+.vehicle {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:42px;
+  width:100%;
+}
+.vehicle-svg {
+  display:block;
+  overflow:visible;
+  filter:drop-shadow(0 3px 3px #0008);
+}
+.car-svg {width:min(82%,76px);height:38px;}
+.bike-svg {width:min(76%,64px);height:36px;}
+.vehicle-svg.compact {max-height:36px;}
+.bayplate {
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#d7e5f5;
+  font-size:7px;
+  letter-spacing:.3px;
+  margin-top:1px;
+}
+.bayoccupied {
+  background:linear-gradient(145deg,#20384b,#172b3d);
+  border-color:#3b7188;
+}
+.bayoccupied .baystate {color:#65dfba;}
+.movingcar {
+  position:absolute;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:76px;
+  height:36px;
+  z-index:2;
+}
+.movingcar .vehicle-svg {width:70px;height:36px;}
+.carone {
+  top:25px;
+  left:-90px;
+  animation:parkwise-drive 12s linear infinite;
+}
+.cartwo {
+  bottom:4px;
+  left:-90px;
+  animation:parkwise-drive 16s linear infinite;
+  animation-delay:-5s;
+}
+@keyframes parkwise-drive {
+  0% {transform:translateX(0);}
+  100% {transform:translateX(calc(100vw + 180px));}
+}
+@media(prefers-reduced-motion:reduce) {
+  .movingcar,.garagescan {animation:none!important;}
+  .movingcar {left:42%;}
+}
